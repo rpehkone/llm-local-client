@@ -16,3 +16,5 @@ python run.py
 |-----------------|----------------|----------------------------------------------------|
 | OPENAI_API_KEY  | openai_key     | sk-...                                             
 | OPENAI_API_BASE | openai_api_key | https://api.openai.com <br> openai.azure.com <br> http://my-reverse-proxy/  
+
+<img src="img.png" width="1000" height="auto"/>  
