@@ -7,7 +7,7 @@ from json import load
 if __name__ == '__main__':
     config = load(open('config.json', 'r'))
     site_config = config['site_config']
-    
+
     site = Website(app)
     for route in site.routes:
         app.add_url_rule(
