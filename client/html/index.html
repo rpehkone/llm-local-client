@@ -103,6 +103,21 @@
                             <option value="gpt-evil-1.0">evil 1.0</option>
                         </select>
                     </div>
+                    <div class="field">
+                        <select name="promptgen" id="promptgen">
+                            <option value="0" selected>Prompt engineer</option>
+                            <option value="a" selected>Code refactor</option>
+                            <option value="b" selected>Code transation</option>
+                            <option value="c" selected>Code documentation</option>
+                            <option value="z" selected>C vectorize</option>
+                            <option value="prompt" style="display: none" selected>Prompt</option>
+                        </select>
+                    </div>
+                    <div class="field">
+                        <input type="checkbox" id="switch2"/>
+                        <label for="switch2"></label>
+                        <span class="about">TTS</span>
+                    </div>
                 </div>
                 <div class="stop_generating stop_generating-hidden">
                     <button id="cancelButton">

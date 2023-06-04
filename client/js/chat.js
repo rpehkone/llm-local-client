@@ -533,29 +533,29 @@ const load_settings_localstorage = async () => {
   });
 };
 
-// Theme storage for recurring viewers
-const storeTheme = function (theme) {
-  localStorage.setItem("theme", theme);
-};
+document.getElementById('promptgen').addEventListener('change', function() {
+    var selected = this.options[this.selectedIndex].value;
+    let msg = '';
 
-// set theme when visitor returns
-const setTheme = function () {
-  const activeTheme = localStorage.getItem("theme");
-  colorThemes.forEach((themeOption) => {
-    if (themeOption.id === activeTheme) {
-      themeOption.checked = true;
+    switch (selected) {
+      case '0':
+        msg = 'You will be my prompt engineer. We will iterate the prompts you output in order to arrive at a prompt that gives me the desired output. The first output you give me will ask what the prompt will be about, with some questions to get us on the right track. Then once you have an initial understanding of what the prompt is about, you will provide me with the first iteration. Then you will ask more questions to make the prompt better. We will continue this iterative process until we have arrived at the prompt we need to generate my desired output.';
+        break;
+      case 'a':
+        msg = 'Suggest refactoring improvements and changes for the following code:';
+        break;
+      case 'b':
+        msg = 'Translate the following code to ';
+        break;
+      case 'c':
+        msg = 'Create documentation for functionality and API of the following code: '
+        break;
+      case 'z':
+        msg = 'Rewrite the following c code to use SSE and AVX vectorization: ';
+        break;
+      default:
+        break;
     }
-  });
-  // fallback for no :has() support
-  document.documentElement.className = activeTheme;
-};
-
-colorThemes.forEach((themeOption) => {
-  themeOption.addEventListener("click", () => {
-    storeTheme(themeOption.id);
-    // fallback for no :has() support
-    document.documentElement.className = themeOption.id;
-  });
+    document.getElementById('message-input').value = msg;
+    this.value = 'prompt';
 });
-
-document.onload = setTheme();
