@@ -3,6 +3,7 @@
     --colour-3: #e4e4e4;
 
     --accent: #8000ff;
+    --enabled: #008800;
     --blur-bg: #444654;
     --blur-border: #000000;
     --user-input: #000000;
@@ -65,7 +66,7 @@ body {
 .conversation {
     width: 100%;
     min-height: 50%;
-    height: 100vh;
+    height: 95vh;
     overflow-y: scroll;
     overflow-x: hidden;
     display: flex;
@@ -84,7 +85,7 @@ body {
 }
 
 .conversation .user-input {
-    max-height: 10vh;
+    max-height: 40vh;
 }
 
 .conversation .user-input input {
@@ -101,29 +102,6 @@ body {
 .conversation .user-input input::placeholder {
     color: var(--user-input)
 }
-
-.gradient:nth-child(1) {
-    --top: 0;
-    --right: 0;
-    --size: 70vw;
-    /* --blur: calc(0.5 * var(--size)); */
-    --opacity: 0.3;
-    animation: zoom_gradient 6s infinite;
-}
-
-/* .gradient {
-    position: absolute;
-    z-index: -1;
-    border-radius: calc(0.5 * var(--size));
-    background-color: var(--accent);
-    background: radial-gradient(circle at center, var(--accent), var(--accent));
-    width: 70vw;
-    height: 70vw;
-    top: 50%;
-    right: 0;
-    transform: translateY(-50%);
-    /* filter: blur(calc(0.5 * 70vw)) opacity(var(--opacity)); */
-} */
 
 .conversations {
     display: flex;
@@ -359,7 +337,7 @@ label:after {
 }
 
 input:checked+label {
-    /* background: var(--blur-border); */
+    background: var(--enabled);
 }
 
 input:checked+label:after {
@@ -405,8 +383,8 @@ select {
     /* backdrop-filter: blur(20px); */
 
     cursor: pointer;
-    /* background-color: var(--blur-bg); */
-    /* border: 1px solid var(--blur-border); */
+    background-color: var(--blur-bg);
+    border: 1px solid var(--blur-border);
     color: var(--colour-3);
     display: block;
     position: relative;
