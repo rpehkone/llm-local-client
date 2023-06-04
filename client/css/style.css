@@ -1,33 +1,12 @@
-@import url("https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700;800;900&display=swap");
-
-/* :root {
-    --colour-1: #ffffff;
-    --colour-2: #000000;
-    --colour-3: #000000;
-    --colour-4: #000000;
-    --colour-5: #000000;
-    --colour-6: #000000;
-
-    --accent: #ffffff;
-    --blur-bg: #98989866;
-    --blur-border: #00000040;
-    --user-input: #000000;
-    --conversations: #000000;
-} */
-
 :root {
-    --colour-1: #000000;
-    --colour-2: #ccc;
-    --colour-3: #e4d4ff;
-    --colour-4: #f0f0f0;
-    --colour-5: #181818;
-    --colour-6: #242424;
+    --colour-1: #202123ff;
+    --colour-3: #e4e4e4;
 
-    --accent: #8b3dff;
-    --blur-bg: #16101b66;
-    --blur-border: #84719040;
-    --user-input: #ac87bb;
-    --conversations: #c7a2ff;
+    --accent: #8000ff;
+    --blur-bg: #444654;
+    --blur-border: #000000;
+    --user-input: #000000;
+    --conversations: #000000ff;
 }
 
 :root {
@@ -64,13 +43,13 @@ body {
 }
 
 .box {
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
+    /* backdrop-filter: blur(20px); */
+    /* -webkit-backdrop-filter: blur(20px); */
     background-color: var(--blur-bg);
     height: 100%;
     width: 100%;
     border-radius: var(--border-radius-1);
-    border: 1px solid var(--blur-border);
+    /* border: 1px solid var(--blur-border); */
 }
 
 .conversations {
@@ -127,12 +106,12 @@ body {
     --top: 0;
     --right: 0;
     --size: 70vw;
-    --blur: calc(0.5 * var(--size));
+    /* --blur: calc(0.5 * var(--size)); */
     --opacity: 0.3;
     animation: zoom_gradient 6s infinite;
 }
 
-.gradient {
+/* .gradient {
     position: absolute;
     z-index: -1;
     border-radius: calc(0.5 * var(--size));
@@ -143,8 +122,8 @@ body {
     top: 50%;
     right: 0;
     transform: translateY(-50%);
-    filter: blur(calc(0.5 * 70vw)) opacity(var(--opacity));
-}
+    /* filter: blur(calc(0.5 * 70vw)) opacity(var(--opacity)); */
+} */
 
 .conversations {
     display: flex;
@@ -221,10 +200,10 @@ body {
     height: 100%;
     object-fit: cover;
     border-radius: 8px;
-    outline: 1px solid var(--blur-border);
+    /* outline: 1px solid var(--blur-border); */
 }
 
-.message .user:after {
+.message user:after {
     content: "63";
     position: absolute;
     bottom: 0;
@@ -354,11 +333,11 @@ label {
     text-indent: -9999px;
     width: 50px;
     height: 30px;
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
+    /* backdrop-filter: blur(20px); */
+    /* -webkit-backdrop-filter: blur(20px); */
     background-color: var(--blur-bg);
     border-radius: var(--border-radius-1);
-    border: 1px solid var(--blur-border);
+    /* border: 1px solid var(--blur-border); */
     display: block;
     border-radius: 100px;
     position: relative;
@@ -380,7 +359,7 @@ label:after {
 }
 
 input:checked+label {
-    background: var(--blur-border);
+    /* background: var(--blur-border); */
 }
 
 input:checked+label:after {
@@ -403,9 +382,9 @@ input:checked+label:after {
     padding-right: 15px
 }
 
-.field .about {
+.field .about .select * {
     font-size: 14px;
-    color: var(--colour-3);
+    color: var(--blur-bg);
 }
 
 .disable-scrollbars::-webkit-scrollbar {
@@ -423,12 +402,12 @@ select {
     -moz-border-radius: 8px;
     border-radius: 8px;
 
-    -webkit-backdrop-filter: blur(20px);
-    backdrop-filter: blur(20px);
+    /* -webkit-backdrop-filter: blur(20px); */
+    /* backdrop-filter: blur(20px); */
 
     cursor: pointer;
-    background-color: var(--blur-bg);
-    border: 1px solid var(--blur-border);
+    /* background-color: var(--blur-bg); */
+    /* border: 1px solid var(--blur-border); */
     color: var(--colour-3);
     display: block;
     position: relative;
@@ -444,19 +423,6 @@ select {
     align-items: center;
     padding-right: 15px;
     cursor: pointer;
-}
-
-.info {
-    padding: 8px 12px;
-    display: flex;
-    gap: 18px;
-    align-items: center;
-    user-select: none;
-    background: transparent;
-    border-radius: var(--border-radius-1);
-    width: 100%;
-    cursor: default;
-    border: 1px dashed var(--conversations)
 }
 
 .bottom_buttons {
@@ -569,11 +535,11 @@ ul {
     margin: 10px;
     font-size: 20px;
     cursor: pointer;
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
-    background-color: var(--blur-bg);
+    /* backdrop-filter: blur(20px); */
+    /* -webkit-backdrop-filter: blur(20px); */
+    /* background-color: var(--blur-bg); */
     border-radius: 10px;
-    border: 1px solid var(--blur-border);
+    /* border: 1px solid var(--blur-border); */
     width: 40px;
     height: 40px;
     justify-content: center;
@@ -713,7 +679,6 @@ a:-webkit-any-link {
     width: 1px;
 }
 
-
 .color-picker>fieldset {
     border: 0;
     display: flex;
@@ -721,12 +686,12 @@ a:-webkit-any-link {
     background: var(--colour-1);
     margin-inline: auto;
     border-radius: 8px;
-    -webkit-backdrop-filter: blur(20px);
-    backdrop-filter: blur(20px);
+    /* -webkit-backdrop-filter: blur(20px); */
+    /* backdrop-filter: blur(20px); */
     cursor: pointer;
     background-color: var(--blur-bg);
-    border: 1px solid var(--blur-border);
-    color: var(--colour-3);
+    /* border: 1px solid var(--blur-border);
+    color: var(--colour-3); */
     display: block;
     position: relative;
     overflow: hidden;
@@ -734,82 +699,20 @@ a:-webkit-any-link {
     padding: 6px 16px;
 }
 
-.color-picker input[type="radio"]:checked {
-    background-color: var(--radio-color);
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
 }
 
-.color-picker input[type="radio"]#light {
-    --radio-color: gray;
+::-webkit-scrollbar-track {
+  background: #000;
 }
 
-.color-picker input[type="radio"]#pink {
-    --radio-color: pink;
+::-webkit-scrollbar-thumb {
+  background: #aaa;
+  border-radius: 20px;
 }
 
-.color-picker input[type="radio"]#blue {
-    --radio-color: blue;
-}
-
-.color-picker input[type="radio"]#green {
-    --radio-color: green;
-}
-
-.color-picker input[type="radio"]#dark {
-    --radio-color: #232323;
-}
-
-.pink {
-    --colour-1: hsl(310 50% 90%);
-    --clr-card-bg: hsl(310 50% 100%);
-    --colour-3: hsl(310 50% 15%);
-    --conversations: hsl(310 50% 25%);
-}
-
-.blue {
-    --colour-1: hsl(209 50% 90%);
-    --clr-card-bg: hsl(209 50% 100%);
-    --colour-3: hsl(209 50% 15%);
-    --conversations: hsl(209 50% 25%);
-}
-
-.green {
-    --colour-1: hsl(109 50% 90%);
-    --clr-card-bg: hsl(109 50% 100%);
-    --colour-3: hsl(109 50% 15%);
-    --conversations: hsl(109 50% 25%);
-}
-
-.dark {
-    --colour-1: hsl(209 50% 10%);
-    --clr-card-bg: hsl(209 50% 5%);
-    --colour-3: hsl(209 50% 90%);
-    --conversations: hsl(209 50% 80%);
-}
-
-:root:has(#pink:checked) {
-    --colour-1: hsl(310 50% 90%);
-    --clr-card-bg: hsl(310 50% 100%);
-    --colour-3: hsl(310 50% 15%);
-    --conversations: hsl(310 50% 25%);
-}
-
-:root:has(#blue:checked) {
-    --colour-1: hsl(209 50% 90%);
-    --clr-card-bg: hsl(209 50% 100%);
-    --colour-3: hsl(209 50% 15%);
-    --conversations: hsl(209 50% 25%);
-}
-
-:root:has(#green:checked) {
-    --colour-1: hsl(109 50% 90%);
-    --clr-card-bg: hsl(109 50% 100%);
-    --colour-3: hsl(109 50% 15%);
-    --conversations: hsl(109 50% 25%);
-}
-
-:root:has(#dark:checked) {
-    --colour-1: hsl(209 50% 10%);
-    --clr-card-bg: hsl(209 50% 5%);
-    --colour-3: hsl(209 50% 90%);
-    --conversations: hsl(209 50% 80%);
+::-webkit-scrollbar-thumb:hover {
+  background: #ccc;
 }
