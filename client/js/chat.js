@@ -14,22 +14,9 @@ let prompt_lock = false;
 
 hljs.addPlugin(new CopyButtonPlugin());
 
-function resizeTextarea(textarea) {
-  textarea.style.height = '80px';
-  textarea.style.height = Math.min(textarea.scrollHeight, 200) + 'px';
-}
-
 const format = (text) => {
   return text.replace(/(?:\r\n|\r|\n)/g, "<br>");
 };
-
-message_input.addEventListener("blur", () => {
-  window.scrollTo(0, 0);
-});
-
-message_input.addEventListener("focus", () => {
-  document.documentElement.scrollTop = document.documentElement.scrollHeight;
-});
 
 const delete_conversations = async () => {
   localStorage.clear();
@@ -37,7 +24,6 @@ const delete_conversations = async () => {
 };
 
 const handle_ask = async () => {
-  message_input.style.height = `80px`;
   message_input.focus();
 
   window.scrollTo(0, 0);
@@ -467,7 +453,7 @@ message_input.addEventListener(`keydown`, async (evt) => {
         console.log('pressed enter');
         await handle_ask();
     } else {
-      message_input.style.removeProperty("height");
+      message_input.style.height = `25px`;
       message_input.style.height = message_input.scrollHeight + 4 + "px";
     }
   });
@@ -480,20 +466,6 @@ message_input.addEventListener(`keydown`, async (evt) => {
 
   register_settings_localstorage();
 };
-
-document.querySelector(".mobile-sidebar").addEventListener("click", (event) => {
-  const sidebar = document.querySelector(".conversations");
-
-  if (sidebar.classList.contains("shown")) {
-    sidebar.classList.remove("shown");
-    event.target.classList.remove("rotated");
-  } else {
-    sidebar.classList.add("shown");
-    event.target.classList.add("rotated");
-  }
-
-  window.scrollTo(0, 0);
-});
 
 const register_settings_localstorage = async () => {
   settings_ids = ["switch", "model", "jailbreak"];
