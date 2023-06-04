@@ -78,22 +78,6 @@
                 </div>
             </div>
             <div class="conversation disable-scrollbars">
-                <div class="stop_generating stop_generating-hidden">
-                    <button id="cancelButton">
-                        <span>Stop Generating</span>
-                        <i class="fa-regular fa-stop"></i>
-                    </button>
-                </div>
-                <div class="box" id="messages">
-                </div>
-                <div class="user-input">
-                    <div class="box input-box">
-                        <textarea id="message-input" placeholder="Ask a question" cols="30" rows="10" style="white-space: pre-wrap;" oninput="resizeTextarea(this)"></textarea>
-                        <div id="send-button">
-                            <i class="fa-regular fa-paper-plane-top"></i>
-                        </div>
-                    </div>
-                </div>
                 <div class="buttons">
                     <div class="field">
                         <input type="checkbox" id="switch"/>
@@ -119,6 +103,22 @@
                             <option value="gpt-dev-2.0">dev 2.0</option>
                             <option value="gpt-evil-1.0">evil 1.0</option>
                         </select>
+                    </div>
+                </div>
+                <div class="stop_generating stop_generating-hidden">
+                    <button id="cancelButton">
+                        <span>Stop Generating</span>
+                        <i class="fa-regular fa-stop"></i>
+                    </button>
+                </div>
+                <div class="box" id="messages">
+                </div>
+                <div class="user-input">
+                    <div class="box input-box">
+                        <textarea id="message-input" placeholder="Ask a question" cols="30" rows="10" style="white-space: pre-wrap;" oninput="resizeTextarea(this)"></textarea>
+                        <div id="send-button">
+                            <i class="fa-regular fa-paper-plane-top"></i>
+                        </div>
                     </div>
                 </div>
             </div>
