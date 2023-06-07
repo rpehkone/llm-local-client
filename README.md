@@ -1,4 +1,4 @@
-## ChatGPT Clone  
+## ChatGPT local client  
 
 ```
 python -m venv venv  
