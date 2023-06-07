@@ -1,7 +1,6 @@
 const query = (obj) =>
-  Object.keys(obj)
-    .map((k) => encodeURIComponent(k) + "=" + encodeURIComponent(obj[k]))
-    .join("&");
+	Object.keys(obj)
+		.map((k) => encodeURIComponent(k) + "=" + encodeURIComponent(obj[k])).join("&");
 const colorThemes = document.querySelectorAll('[name="theme"]');
 const markdown = window.markdownit();
 const message_box = document.getElementById(`messages`);
@@ -15,550 +14,544 @@ let prompt_lock = false;
 hljs.addPlugin(new CopyButtonPlugin());
 
 const format = (text) => {
-  return text.replace(/(?:\r\n|\r|\n)/g, "<br>");
+	return text.replace(/(?:\r\n|\r|\n)/g, "<br>");
 };
 
 const delete_conversations = async () => {
-  localStorage.clear();
-  await new_conversation();
+	localStorage.clear();
+	await new_conversation();
 };
 
 const handle_ask = async () => {
-  message_input.focus();
+	message_input.focus();
 
-  window.scrollTo(0, 0);
-  let message = message_input.value;
+	window.scrollTo(0, 0);
+	let message = message_input.value;
 
-  if (message.length > 0) {
-    message_input.value = ``;
-    await ask_gpt(message);
-  }
+	if (message.length > 0) {
+		message_input.value = ``;
+		await ask_gpt(message);
+	}
 };
 
 const remove_cancel_button = async () => {
-  stop_generating.classList.add(`stop_generating-hiding`);
+	stop_generating.classList.add(`stop_generating-hiding`);
 
-  setTimeout(() => {
-    stop_generating.classList.remove(`stop_generating-hiding`);
-    stop_generating.classList.add(`stop_generating-hidden`);
-  }, 300);
+	setTimeout(() => {
+		stop_generating.classList.remove(`stop_generating-hiding`);
+		stop_generating.classList.add(`stop_generating-hidden`);
+	}, 300);
 };
 
 let tts_rolling_buffer = ""
 function tts_tick(chunk, last_tick) {
 	tts_rolling_buffer += chunk
 
-  tts_enabled = true;
-  if (!tts_enabled) {
-    return;
-  }
+	tts_enabled = true;
+	if (!tts_enabled) {
+		return;
+	}
 
 	let words = tts_rolling_buffer.split(' ');
-  if (!words) {
-    return;
-  }
+	if (!words) {
+		return;
+	}
 	//find n + 1 words but speak only n (last word might be uncomplete)
-  let n = 20;
+	let n = 20;
 	if (words.length > n || last_tick) {
-    speak = words.slice(0, n).join(' ');
-    tts_rolling_buffer = words.slice(n).join(' ');
-    console.log('roll= ', tts_rolling_buffer)
-    console.log('speak= ', speak)
+		speak = words.slice(0, n).join(' ');
+		tts_rolling_buffer = words.slice(n).join(' ');
 		var utterance = new SpeechSynthesisUtterance(speak);
-    utterance.rate = 1.5;
+		utterance.rate = 1.5;
 		window.speechSynthesis.speak(utterance);
 	}
 }
 
-const ask_gpt = async (message) => {
-  try {
-    message_input.value = ``;
-    message_input.innerHTML = ``;
-    message_input.innerText = ``;
+async function try_ask_gpt(message) {
+	message_input.value = ``;
+	message_input.innerHTML = ``;
+	message_input.innerText = ``;
 
-    add_conversation(window.conversation_id, message.substr(0, 20));
-    window.scrollTo(0, 0);
-    window.controller = new AbortController();
+	add_conversation(window.conversation_id, message.substr(0, 20));
+	window.scrollTo(0, 0);
+	window.controller = new AbortController();
 
-    jailbreak = document.getElementById("jailbreak");
-    model = document.getElementById("model");
-    prompt_lock = true;
-    window.text = ``;
-    window.token = message_id();
+	jailbreak = document.getElementById("jailbreak");
+	model = document.getElementById("model");
+	prompt_lock = true;
+	window.text = ``;
+	window.token = message_id();
 
-    stop_generating.classList.remove(`stop_generating-hidden`);
+	stop_generating.classList.remove(`stop_generating-hidden`);
 
-    message_box.innerHTML += `
-            <div class="message">
-                <div class="user">
-                    ${user_image}
-                </div>
-                <div class="content" id="user_${token}"> 
-                    ${format(message)}
-                </div>
-            </div>
-        `;
+	message_box.innerHTML += `
+					<div class="message">
+							<div class="user">
+									${user_image}
+							</div>
+							<div class="content" id="user_${token}"> 
+									${format(message)}
+							</div>
+					</div>
+			`;
 
-    /* .replace(/(?:\r\n|\r|\n)/g, '<br>') */
+	/* .replace(/(?:\r\n|\r|\n)/g, '<br>') */
 
-    message_box.scrollTop = message_box.scrollHeight;
-    window.scrollTo(0, 0);
-    await new Promise((r) => setTimeout(r, 500));
-    window.scrollTo(0, 0);
+	message_box.scrollTop = message_box.scrollHeight;
+	window.scrollTo(0, 0);
+	await new Promise((r) => setTimeout(r, 500));
+	window.scrollTo(0, 0);
 
-    message_box.innerHTML += `
-            <div class="message">
-                <div class="user">
-                    ${gpt_image}
-                </div>
-                <div class="content" id="gpt_${window.token}">
-                    <div id="cursor"></div>
-                </div>
-            </div>
-        `;
+	message_box.innerHTML += `
+					<div class="message">
+							<div class="user">
+									${gpt_image}
+							</div>
+							<div class="content" id="gpt_${window.token}">
+									<div id="cursor"></div>
+							</div>
+					</div>
+			`;
 
-    message_box.scrollTop = message_box.scrollHeight;
-    window.scrollTo(0, 0);
-    await new Promise((r) => setTimeout(r, 1000));
-    window.scrollTo(0, 0);
+	message_box.scrollTop = message_box.scrollHeight;
+	window.scrollTo(0, 0);
+	await new Promise((r) => setTimeout(r, 1000));
+	window.scrollTo(0, 0);
 
-    const response = await fetch(`/backend-api/v2/conversation`, {
-      method: `POST`,
-      signal: window.controller.signal,
-      headers: {
-        "content-type": `application/json`,
-        accept: `text/event-stream`,
-      },
-      body: JSON.stringify({
-        conversation_id: window.conversation_id,
-        action: `_ask`,
-        model: model.options[model.selectedIndex].value,
-        jailbreak: jailbreak.options[jailbreak.selectedIndex].value,
-        meta: {
-          id: window.token,
-          content: {
-            conversation: await get_conversation(window.conversation_id),
-            internet_access: document.getElementById("switch").checked,
-            content_type: "text",
-            parts: [
-              {
-                content: message,
-                role: "user",
-              },
-            ],
-          },
-        },
-      }),
-    });
+	const response = await fetch(`/backend-api/v2/conversation`, {
+		method: `POST`,
+		signal: window.controller.signal,
+		headers: {
+			"content-type": `application/json`,
+			accept: `text/event-stream`,
+		},
+		body: JSON.stringify({
+			conversation_id: window.conversation_id,
+			action: `_ask`,
+			model: model.options[model.selectedIndex].value,
+			jailbreak: jailbreak.options[jailbreak.selectedIndex].value,
+			meta: {
+				id: window.token,
+				content: {
+					conversation: await get_conversation(window.conversation_id),
+					internet_access: document.getElementById("switch").checked,
+					content_type: "text",
+					parts: [
+						{
+							content: message,
+							role: "user",
+						},
+					],
+				},
+			},
+		}),
+	});
 
-    const reader = response.body.getReader();
+	const reader = response.body.getReader();
 
-    tts_rolling_buffer = ""
-    while (true) {
-      const { value, done } = await reader.read();
-      if (done) break;
+	tts_rolling_buffer = ""
+	while (true) {
+		const { value, done } = await reader.read();
+		if (done) break;
 
-      chunk = new TextDecoder().decode(value);
+		chunk = new TextDecoder().decode(value);
 
-      if (
-        chunk.includes(
-          `<form id="challenge-form" action="/backend-api/v2/conversation?`
-        )
-      ) {
-        chunk = `cloudflare token expired, please refresh the page.`;
-      }
-      tts_tick(chunk, false);
-      text += chunk;
+		if (chunk.includes(`<form id="challenge-form" action="/backend-api/v2/conversation?`)) {
+			chunk = `cloudflare token expired, please refresh the page.`;
+		}
+		tts_tick(chunk, false);
+		text += chunk;
 
-      // const objects         = chunk.match(/({.+?})/g);
+		// const objects         = chunk.match(/({.+?})/g);
 
-      // try { if (JSON.parse(objects[0]).success === false) throw new Error(JSON.parse(objects[0]).error) } catch (e) {}
+		// try { if (JSON.parse(objects[0]).success === false) throw new Error(JSON.parse(objects[0]).error) } catch (e) {}
 
-      // objects.forEach((object) => {
-      //     console.log(object)
-      //     try { text += h2a(JSON.parse(object).content) } catch(t) { console.log(t); throw new Error(t)}
-      // });
+		// objects.forEach((object) => {
+		//     console.log(object)
+		//     try { text += h2a(JSON.parse(object).content) } catch(t) { console.log(t); throw new Error(t)}
+		// });
 
-      document.getElementById(`gpt_${window.token}`).innerHTML =
-        markdown.render(text);
-      document.querySelectorAll(`code`).forEach((el) => {
-        hljs.highlightElement(el);
-      });
+		document.getElementById(`gpt_${window.token}`).innerHTML =
+			markdown.render(text);
+		document.querySelectorAll(`code`).forEach((el) => {
+			hljs.highlightElement(el);
+		});
 
-      window.scrollTo(0, 0);
-      message_box.scrollTo({ top: message_box.scrollHeight, behavior: "auto" });
-    }
+		window.scrollTo(0, 0);
+		message_box.scrollTo({ top: message_box.scrollHeight, behavior: "auto" });
+	}
 	tts_tick("", true);
 
-    // if text contains :
-    if (
-      text.includes(
-        `instead. Maintaining this website and API costs a lot of money`
-      )
-    ) {
-      document.getElementById(`gpt_${window.token}`).innerHTML =
-        "An error occured, please reload / refresh cache and try again.";
-    }
-    //TODO:
-    //add error check for gpt api response
-    //and proxy enable
+	// if text contains :
+	if (text.includes(`instead. Maintaining this website and API costs a lot of money`)) {
+		document.getElementById(`gpt_${window.token}`).innerHTML =
+			"An error occured, please reload / refresh cache and try again.";
+	}
+	//TODO:
+	//add error check for gpt api response
+	//and proxy enable
 
-    add_message(window.conversation_id, "user", message);
-    add_message(window.conversation_id, "assistant", text);
+	add_message(window.conversation_id, "user", message);
+	add_message(window.conversation_id, "assistant", text);
 
-    message_box.scrollTop = message_box.scrollHeight;
-    await remove_cancel_button();
-    prompt_lock = false;
+	message_box.scrollTop = message_box.scrollHeight;
+	await remove_cancel_button();
+	prompt_lock = false;
 
-    await load_conversations(20, 0);
-    window.scrollTo(0, 0);
-  } catch (e) {
-    add_message(window.conversation_id, "user", message);
+	await load_conversations(20, 0);
+	window.scrollTo(0, 0);
+};
 
-    message_box.scrollTop = message_box.scrollHeight;
-    await remove_cancel_button();
-    prompt_lock = false;
+const ask_gpt = async (message) => {
+	try {
+		try_ask_gpt(message);
+	} catch (e) {
+		add_message(window.conversation_id, "user", message);
 
-    await load_conversations(20, 0);
+		message_box.scrollTop = message_box.scrollHeight;
+		await remove_cancel_button();
+		prompt_lock = false;
 
-    console.log(e);
+		await load_conversations(20, 0);
 
-    let cursorDiv = document.getElementById(`cursor`);
-    if (cursorDiv) cursorDiv.parentNode.removeChild(cursorDiv);
+		console.log(e);
 
-    if (e.name != `AbortError`) {
-      let error_message = `oops ! something went wrong, please try again / reload. [stacktrace in console]`;
+		let cursorDiv = document.getElementById(`cursor`);
+		if (cursorDiv) cursorDiv.parentNode.removeChild(cursorDiv);
 
-      document.getElementById(`gpt_${window.token}`).innerHTML = error_message;
-      add_message(window.conversation_id, "assistant", error_message);
-    } else {
-      document.getElementById(`gpt_${window.token}`).innerHTML += ` [aborted]`;
-      add_message(window.conversation_id, "assistant", text + ` [aborted]`);
-    }
+		if (e.name != `AbortError`) {
+			let error_message = `oops ! something went wrong, please try again / reload. [stacktrace in console]`;
 
-    window.scrollTo(0, 0);
-  }
+			document.getElementById(`gpt_${window.token}`).innerHTML = error_message;
+			add_message(window.conversation_id, "assistant", error_message);
+		} else {
+			document.getElementById(`gpt_${window.token}`).innerHTML += ` [aborted]`;
+			add_message(window.conversation_id, "assistant", text + ` [aborted]`);
+		}
+
+		window.scrollTo(0, 0);
+	}
 };
 
 const clear_conversations = async () => {
-  const elements = box_conversations.childNodes;
-  let index = elements.length;
+	const elements = box_conversations.childNodes;
+	let index = elements.length;
 
-  if (index > 0) {
-    while (index--) {
-      const element = elements[index];
-      if (
-        element.nodeType === Node.ELEMENT_NODE &&
-        element.tagName.toLowerCase() !== `button`
-      ) {
-        box_conversations.removeChild(element);
-      }
-    }
-  }
+	if (index > 0) {
+		while (index--) {
+			const element = elements[index];
+			if (
+				element.nodeType === Node.ELEMENT_NODE &&
+				element.tagName.toLowerCase() !== `button`
+			) {
+				box_conversations.removeChild(element);
+			}
+		}
+	}
 };
 
 const clear_conversation = async () => {
-  let messages = message_box.getElementsByTagName(`div`);
+	let messages = message_box.getElementsByTagName(`div`);
 
-  while (messages.length > 0) {
-    message_box.removeChild(messages[0]);
-  }
+	while (messages.length > 0) {
+		message_box.removeChild(messages[0]);
+	}
 };
 
 const show_option = async (conversation_id) => {
-  const conv = document.getElementById(`conv-${conversation_id}`);
-  const yes = document.getElementById(`yes-${conversation_id}`);
-  const not = document.getElementById(`not-${conversation_id}`);
+	const conv = document.getElementById(`conv-${conversation_id}`);
+	const yes = document.getElementById(`yes-${conversation_id}`);
+	const not = document.getElementById(`not-${conversation_id}`);
 
-  conv.style.display = "none";
-  yes.style.display = "block";
-  not.style.display = "block"; 
+	conv.style.display = "none";
+	yes.style.display = "block";
+	not.style.display = "block"; 
 }
 
 const hide_option = async (conversation_id) => {
-  const conv = document.getElementById(`conv-${conversation_id}`);
-  const yes = document.getElementById(`yes-${conversation_id}`);
-  const not = document.getElementById(`not-${conversation_id}`);
+	const conv = document.getElementById(`conv-${conversation_id}`);
+	const yes = document.getElementById(`yes-${conversation_id}`);
+	const not = document.getElementById(`not-${conversation_id}`);
 
-  conv.style.display = "block";
-  yes.style.display = "none";
-  not.style.display = "none"; 
+	conv.style.display = "block";
+	yes.style.display = "none";
+	not.style.display = "none"; 
 }
 
 const delete_conversation = async (conversation_id) => {
-  localStorage.removeItem(`conversation:${conversation_id}`);
+	localStorage.removeItem(`conversation:${conversation_id}`);
 
-  const conversation = document.getElementById(`convo-${conversation_id}`);
-    conversation.remove();
+	const conversation = document.getElementById(`convo-${conversation_id}`);
+		conversation.remove();
 
-  if (window.conversation_id == conversation_id) {
-    await new_conversation();
-  }
+	if (window.conversation_id == conversation_id) {
+		await new_conversation();
+	}
 
-  await load_conversations(20, 0, true);
+	await load_conversations(20, 0, true);
 };
 
 const set_conversation = async (conversation_id) => {
-  history.pushState({}, null, `/chat/${conversation_id}`);
-  window.conversation_id = conversation_id;
+	history.pushState({}, null, `/chat/${conversation_id}`);
+	window.conversation_id = conversation_id;
 
-  await clear_conversation();
-  await load_conversation(conversation_id);
-  await load_conversations(20, 0, true);
+	await clear_conversation();
+	await load_conversation(conversation_id);
+	await load_conversations(20, 0, true);
 };
 
 const new_conversation = async () => {
-  history.pushState({}, null, `/chat/`);
-  window.conversation_id = uuid();
+	history.pushState({}, null, `/chat/`);
+	window.conversation_id = uuid();
 
-  await clear_conversation();
-  await load_conversations(20, 0, true);
+	await clear_conversation();
+	await load_conversations(20, 0, true);
 };
 
 const load_conversation = async (conversation_id) => {
-  let conversation = await JSON.parse(
-    localStorage.getItem(`conversation:${conversation_id}`)
-  );
-  console.log(conversation, conversation_id);
+	let conversation = await JSON.parse(
+		localStorage.getItem(`conversation:${conversation_id}`)
+	);
+	console.log(conversation, conversation_id);
 
-  for (item of conversation.items) {
-    message_box.innerHTML += `
-            <div class="message">
-                <div class="user">
-                    ${item.role == "assistant" ? gpt_image : user_image}
-                </div>
-                <div class="content">
-                    ${
-                      item.role == "assistant"
-                        ? markdown.render(item.content)
-                        : item.content
-                    }
-                </div>
-            </div>
-        `;
-  }
+	for (item of conversation.items) {
+		message_box.innerHTML += `
+						<div class="message">
+								<div class="user">
+										${item.role == "assistant" ? gpt_image : user_image}
+								</div>
+								<div class="content">
+										${
+											item.role == "assistant"
+												? markdown.render(item.content)
+												: item.content
+										}
+								</div>
+						</div>
+				`;
+	}
 
-  document.querySelectorAll(`code`).forEach((el) => {
-    hljs.highlightElement(el);
-  });
+	document.querySelectorAll(`code`).forEach((el) => {
+		hljs.highlightElement(el);
+	});
 
-  message_box.scrollTo({ top: message_box.scrollHeight, behavior: "smooth" });
+	message_box.scrollTo({ top: message_box.scrollHeight, behavior: "smooth" });
 
-  setTimeout(() => {
-    message_box.scrollTop = message_box.scrollHeight;
-  }, 500);
+	setTimeout(() => {
+		message_box.scrollTop = message_box.scrollHeight;
+	}, 500);
 };
 
 const get_conversation = async (conversation_id) => {
-  let conversation = await JSON.parse(
-    localStorage.getItem(`conversation:${conversation_id}`)
-  );
-  return conversation.items;
+	let conversation = await JSON.parse(
+		localStorage.getItem(`conversation:${conversation_id}`)
+	);
+	return conversation.items;
 };
 
 const add_conversation = async (conversation_id, title) => {
-  if (localStorage.getItem(`conversation:${conversation_id}`) == null) {
-    localStorage.setItem(
-      `conversation:${conversation_id}`,
-      JSON.stringify({
-        id: conversation_id,
-        title: title,
-        items: [],
-      })
-    );
-  }
+	if (localStorage.getItem(`conversation:${conversation_id}`) == null) {
+		localStorage.setItem(
+			`conversation:${conversation_id}`,
+			JSON.stringify({
+				id: conversation_id,
+				title: title,
+				items: [],
+			})
+		);
+	}
 };
 
 const add_message = async (conversation_id, role, content) => {
-  before_adding = JSON.parse(
-    localStorage.getItem(`conversation:${conversation_id}`)
-  );
+	before_adding = JSON.parse(
+		localStorage.getItem(`conversation:${conversation_id}`)
+	);
 
-  before_adding.items.push({
-    role: role,
-    content: content,
-  });
+	before_adding.items.push({
+		role: role,
+		content: content,
+	});
 
-  localStorage.setItem(
-    `conversation:${conversation_id}`,
-    JSON.stringify(before_adding)
-  ); // update conversation
+	localStorage.setItem(
+		`conversation:${conversation_id}`,
+		JSON.stringify(before_adding)
+	); // update conversation
 };
 
 const load_conversations = async (limit, offset, loader) => {
-  //console.log(loader);
-  //if (loader === undefined) box_conversations.appendChild(spinner);
+	//console.log(loader);
+	//if (loader === undefined) box_conversations.appendChild(spinner);
 
-  let conversations = [];
-  for (let i = 0; i < localStorage.length; i++) {
-    if (localStorage.key(i).startsWith("conversation:")) {
-      let conversation = localStorage.getItem(localStorage.key(i));
-      conversations.push(JSON.parse(conversation));
-    }
-  }
+	let conversations = [];
+	for (let i = 0; i < localStorage.length; i++) {
+		if (localStorage.key(i).startsWith("conversation:")) {
+			let conversation = localStorage.getItem(localStorage.key(i));
+			conversations.push(JSON.parse(conversation));
+		}
+	}
 
-  //if (loader === undefined) spinner.parentNode.removeChild(spinner)
-  await clear_conversations();
+	//if (loader === undefined) spinner.parentNode.removeChild(spinner)
+	await clear_conversations();
 
-  for (conversation of conversations) {
-    box_conversations.innerHTML += `
-    <div class="convo" id="convo-${conversation.id}">
-      <div class="left" onclick="set_conversation('${conversation.id}')">
-          <i class="fa-regular fa-comments"></i>
-          <span class="convo-title">${conversation.title}</span>
-      </div>
-      <i onclick="show_option('${conversation.id}')" class="fa-regular fa-trash" id="conv-${conversation.id}"></i>
-      <i onclick="delete_conversation('${conversation.id}')" class="fa-regular fa-check" id="yes-${conversation.id}" style="display:none;"></i>
-      <i onclick="hide_option('${conversation.id}')" class="fa-regular fa-x" id="not-${conversation.id}" style="display:none;"></i>
-    </div>
-    `;
-  }
+	for (conversation of conversations) {
+		box_conversations.innerHTML += `
+		<div class="convo" id="convo-${conversation.id}">
+			<div class="left" onclick="set_conversation('${conversation.id}')">
+					<i class="fa-regular fa-comments"></i>
+					<span class="convo-title">${conversation.title}</span>
+			</div>
+			<i onclick="show_option('${conversation.id}')" class="fa-regular fa-trash" id="conv-${conversation.id}"></i>
+			<i onclick="delete_conversation('${conversation.id}')" class="fa-regular fa-check" id="yes-${conversation.id}" style="display:none;"></i>
+			<i onclick="hide_option('${conversation.id}')" class="fa-regular fa-x" id="not-${conversation.id}" style="display:none;"></i>
+		</div>
+		`;
+	}
 
-  document.querySelectorAll(`code`).forEach((el) => {
-    hljs.highlightElement(el);
-  });
+	document.querySelectorAll(`code`).forEach((el) => {
+		hljs.highlightElement(el);
+	});
 };
 
 document.getElementById(`cancelButton`).addEventListener(`click`, async () => {
-  window.controller.abort();
-  console.log(`aborted ${window.conversation_id}`);
+	window.controller.abort();
+	console.log(`aborted ${window.conversation_id}`);
 });
 
 function h2a(str1) {
-  var hex = str1.toString();
-  var str = "";
+	var hex = str1.toString();
+	var str = "";
 
-  for (var n = 0; n < hex.length; n += 2) {
-    str += String.fromCharCode(parseInt(hex.substr(n, 2), 16));
-  }
+	for (var n = 0; n < hex.length; n += 2) {
+		str += String.fromCharCode(parseInt(hex.substr(n, 2), 16));
+	}
 
-  return str;
+	return str;
 }
 
 const uuid = () => {
-  return `xxxxxxxx-xxxx-4xxx-yxxx-${Date.now().toString(16)}`.replace(
-    /[xy]/g,
-    function (c) {
-      var r = (Math.random() * 16) | 0,
-        v = c == "x" ? r : (r & 0x3) | 0x8;
-      return v.toString(16);
-    }
-  );
+	return `xxxxxxxx-xxxx-4xxx-yxxx-${Date.now().toString(16)}`.replace(
+		/[xy]/g,
+		function (c) {
+			var r = (Math.random() * 16) | 0,
+				v = c == "x" ? r : (r & 0x3) | 0x8;
+			return v.toString(16);
+		}
+	);
 };
 
 const message_id = () => {
-  random_bytes = (Math.floor(Math.random() * 1338377565) + 2956589730).toString(
-    2
-  );
-  unix = Math.floor(Date.now() / 1000).toString(2);
+	random_bytes = (Math.floor(Math.random() * 1338377565) + 2956589730).toString(
+		2
+	);
+	unix = Math.floor(Date.now() / 1000).toString(2);
 
-  return BigInt(`0b${unix}${random_bytes}`).toString();
+	return BigInt(`0b${unix}${random_bytes}`).toString();
 };
 
 window.onload = async () => {
-  load_settings_localstorage();
+	load_settings_localstorage();
 
-  conversations = 0;
-  for (let i = 0; i < localStorage.length; i++) {
-    if (localStorage.key(i).startsWith("conversation:")) {
-      conversations += 1;
-    }
-  }
+	conversations = 0;
+	for (let i = 0; i < localStorage.length; i++) {
+		if (localStorage.key(i).startsWith("conversation:")) {
+			conversations += 1;
+		}
+	}
 
-  if (conversations == 0) localStorage.clear();
+	if (conversations == 0) localStorage.clear();
 
-  await setTimeout(() => {
-    load_conversations(20, 0);
-  }, 1);
+	await setTimeout(() => {
+		load_conversations(20, 0);
+	}, 1);
 
-  if (!window.location.href.endsWith(`#`)) {
-    if (/\/chat\/.+/.test(window.location.href)) {
-      await load_conversation(window.conversation_id);
-    }
-  }
+	if (!window.location.href.endsWith(`#`)) {
+		if (/\/chat\/.+/.test(window.location.href)) {
+			await load_conversation(window.conversation_id);
+		}
+	}
 
-message_input.addEventListener(`keydown`, async (evt) => {
-    if (prompt_lock) return;
-    if (evt.keyCode === 13 && !evt.shiftKey) {
-        evt.preventDefault();
-        console.log('pressed enter');
-        await handle_ask();
-    } else {
-      message_input.style.height = `25px`;
-      message_input.style.height = message_input.scrollHeight + 4 + "px";
-    }
-  });
+	message_input.addEventListener(`keydown`, async (evt) => {
+		if (prompt_lock) return;
+		if (evt.keyCode === 13 && !evt.shiftKey) {
+				evt.preventDefault();
+				console.log('pressed enter');
+				await handle_ask();
+		} else {
+			message_input.style.height = `25px`;
+			message_input.style.height = message_input.scrollHeight + 4 + "px";
+		}
+	});
 
-  send_button.addEventListener(`click`, async () => {
-    console.log("clicked send");
-    if (prompt_lock) return;
-    await handle_ask();
-  });
+	send_button.addEventListener(`click`, async () => {
+		console.log("clicked send");
+		if (prompt_lock) return;
+			await handle_ask();
+	});
 
-  register_settings_localstorage();
+	register_settings_localstorage();
 };
 
 const register_settings_localstorage = async () => {
-  settings_ids = ["switch", "model", "jailbreak"];
-  settings_elements = settings_ids.map((id) => document.getElementById(id));
-  settings_elements.map((element) =>
-    element.addEventListener(`change`, async (event) => {
-      switch (event.target.type) {
-        case "checkbox":
-          localStorage.setItem(event.target.id, event.target.checked);
-          break;
-        case "select-one":
-          localStorage.setItem(event.target.id, event.target.selectedIndex);
-          break;
-        default:
-          console.warn("Unresolved element type");
-      }
-    })
-  );
+	settings_ids = ["switch", "model", "jailbreak"];
+	settings_elements = settings_ids.map((id) => document.getElementById(id));
+	settings_elements.map((element) =>
+		element.addEventListener(`change`, async (event) => {
+			switch (event.target.type) {
+				case "checkbox":
+					localStorage.setItem(event.target.id, event.target.checked);
+					break;
+				case "select-one":
+					localStorage.setItem(event.target.id, event.target.selectedIndex);
+					break;
+				default:
+					console.warn("Unresolved element type");
+			}
+		})
+	);
 };
 
 const load_settings_localstorage = async () => {
-  settings_ids = ["switch", "model", "jailbreak"];
-  settings_elements = settings_ids.map((id) => document.getElementById(id));
-  settings_elements.map((element) => {
-    if (localStorage.getItem(element.id)) {
-      switch (element.type) {
-        case "checkbox":
-          element.checked = localStorage.getItem(element.id) === "true";
-          break;
-        case "select-one":
-          element.selectedIndex = parseInt(localStorage.getItem(element.id));
-          break;
-        default:
-          console.warn("Unresolved element type");
-      }
-    }
-  });
+	settings_ids = ["switch", "model", "jailbreak"];
+	settings_elements = settings_ids.map((id) => document.getElementById(id));
+	settings_elements.map((element) => {
+		if (localStorage.getItem(element.id)) {
+			switch (element.type) {
+				case "checkbox":
+					element.checked = localStorage.getItem(element.id) === "true";
+					break;
+				case "select-one":
+					element.selectedIndex = parseInt(localStorage.getItem(element.id));
+					break;
+				default:
+					console.warn("Unresolved element type");
+			}
+		}
+	});
 };
 
 document.getElementById('promptgen').addEventListener('change', function() {
-    var selected = this.options[this.selectedIndex].value;
-    let msg = '';
+	var selected = this.options[this.selectedIndex].value;
+	let msg = '';
 
-    switch (selected) {
-      case '0':
-        msg = 'You will be my prompt engineer. We will iterate the prompts you output in order to arrive at a prompt that gives me the desired output. The first output you give me will ask what the prompt will be about, with some questions to get us on the right track. Then once you have an initial understanding of what the prompt is about, you will provide me with the first iteration. Then you will ask more questions to make the prompt better. We will continue this iterative process until we have arrived at the prompt we need to generate my desired output.';
-        break;
-      case 'a':
-        msg = 'Suggest refactoring improvements and changes for the following code:';
-        break;
-      case 'b':
-        msg = 'Translate the following code to ';
-        break;
-      case 'c':
-        msg = 'Create documentation for functionality and API of the following code: '
-        break;
-      case 'z':
-        msg = 'Rewrite the following c code to use SSE and AVX vectorization: ';
-        break;
-      default:
-        break;
-    }
-    document.getElementById('message-input').value = msg;
-    this.value = 'prompt';
+	switch (selected) {
+		case '0':
+			msg = 'You will be my prompt engineer. We will iterate the prompts you output in order to arrive at a prompt that gives me the desired output. The first output you give me will ask what the prompt will be about, with some questions to get us on the right track. Then once you have an initial understanding of what the prompt is about, you will provide me with the first iteration. Then you will ask more questions to make the prompt better. We will continue this iterative process until we have arrived at the prompt we need to generate my desired output.';
+			break;
+		case 'a':
+			msg = 'Suggest refactoring improvements and changes for the following code:';
+			break;
+		case 'b':
+			msg = 'Translate the following code to ';
+			break;
+		case 'c':
+			msg = 'Create documentation for functionality and API of the following code: '
+			break;
+		case 'z':
+			msg = 'Rewrite the following c code to use SSE and AVX vectorization: ';
+			break;
+		default:
+			break;
+	}
+	document.getElementById('message-input').value = msg;
+	this.value = 'prompt';
 });
