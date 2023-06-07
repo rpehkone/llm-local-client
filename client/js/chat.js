@@ -47,7 +47,7 @@ let tts_rolling_buffer = ""
 function tts_tick(chunk, last_tick) {
 	tts_rolling_buffer += chunk
 
-	tts_enabled = true;
+	tts_enabled = document.getElementById("tts_switch").checked;
 	if (!tts_enabled) {
 		return;
 	}
@@ -134,7 +134,7 @@ async function try_ask_gpt(message) {
 				id: window.token,
 				content: {
 					conversation: await get_conversation(window.conversation_id),
-					internet_access: document.getElementById("switch").checked,
+					internet_access: document.getElementById("web_switch").checked,
 					content_type: "text",
 					parts: [
 						{
@@ -492,7 +492,7 @@ window.onload = async () => {
 };
 
 const register_settings_localstorage = async () => {
-	settings_ids = ["switch", "model", "jailbreak"];
+	settings_ids = ["web_switch", "model", "jailbreak"];
 	settings_elements = settings_ids.map((id) => document.getElementById(id));
 	settings_elements.map((element) =>
 		element.addEventListener(`change`, async (event) => {
@@ -511,7 +511,7 @@ const register_settings_localstorage = async () => {
 };
 
 const load_settings_localstorage = async () => {
-	settings_ids = ["switch", "model", "jailbreak"];
+	settings_ids = ["web_switch", "model", "jailbreak"];
 	settings_elements = settings_ids.map((id) => document.getElementById(id));
 	settings_elements.map((element) => {
 		if (localStorage.getItem(element.id)) {
