@@ -44,6 +44,32 @@ const remove_cancel_button = async () => {
   }, 300);
 };
 
+let tts_rolling_buffer = ""
+function tts_tick(chunk, last_tick) {
+	tts_rolling_buffer += chunk
+
+  tts_enabled = true;
+  if (!tts_enabled) {
+    return;
+  }
+
+	let words = tts_rolling_buffer.split(' ');
+  if (!words) {
+    return;
+  }
+	//find n + 1 words but speak only n (last word might be uncomplete)
+  let n = 20;
+	if (words.length > n || last_tick) {
+    speak = words.slice(0, n).join(' ');
+    tts_rolling_buffer = words.slice(n).join(' ');
+    console.log('roll= ', tts_rolling_buffer)
+    console.log('speak= ', speak)
+		var utterance = new SpeechSynthesisUtterance(speak);
+    utterance.rate = 1.5;
+		window.speechSynthesis.speak(utterance);
+	}
+}
+
 const ask_gpt = async (message) => {
   try {
     message_input.value = ``;
@@ -127,6 +153,7 @@ const ask_gpt = async (message) => {
 
     const reader = response.body.getReader();
 
+    tts_rolling_buffer = ""
     while (true) {
       const { value, done } = await reader.read();
       if (done) break;
@@ -140,7 +167,7 @@ const ask_gpt = async (message) => {
       ) {
         chunk = `cloudflare token expired, please refresh the page.`;
       }
-
+      tts_tick(chunk, false);
       text += chunk;
 
       // const objects         = chunk.match(/({.+?})/g);
@@ -161,6 +188,7 @@ const ask_gpt = async (message) => {
       window.scrollTo(0, 0);
       message_box.scrollTo({ top: message_box.scrollHeight, behavior: "auto" });
     }
+	tts_tick("", true);
 
     // if text contains :
     if (
@@ -171,6 +199,9 @@ const ask_gpt = async (message) => {
       document.getElementById(`gpt_${window.token}`).innerHTML =
         "An error occured, please reload / refresh cache and try again.";
     }
+    //TODO:
+    //add error check for gpt api response
+    //and proxy enable
 
     add_message(window.conversation_id, "user", message);
     add_message(window.conversation_id, "assistant", text);
