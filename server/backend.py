@@ -84,9 +84,9 @@ class Backend_Api:
                         decoded_line = loads(chunk.decode("utf-8").split("data: ")[1])
                         token = decoded_line["choices"][0]['delta'].get('content')
 
-                        if token != None: 
+                        if token != None:
                             yield token
-                            
+
                     except GeneratorExit:
                         break
 
@@ -94,7 +94,7 @@ class Backend_Api:
                         print(e)
                         print(e.__traceback__.tb_next)
                         continue
-                        
+
             return self.app.response_class(stream(), mimetype='text/event-stream')
 
         except Exception as e:

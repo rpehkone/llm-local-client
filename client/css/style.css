@@ -646,3 +646,66 @@ textarea {
 ::-webkit-scrollbar-thumb:hover {
   background: #ccc;
 }
+
+.prompt_dropdown {
+    display: inline-block;
+    position: relative;
+
+    font-size: 14px;
+    color: var(--blur-bg);
+
+    -webkit-border-radius: 8px;
+    -moz-border-radius: 8px;
+    border-radius: 8px;
+
+    cursor: pointer;
+    background-color: var(--blur-bg);
+    border: 1px solid var(--blur-border);
+    color: var(--colour-3);
+    /* display: block;
+    position: relative;
+    overflow: hidden; */
+    outline: none;
+    padding: 8px 16px;
+
+    appearance: none;
+}
+
+.dropdown-content {
+    background-color: var(--blur-bg);
+    display: none;
+    position: absolute;
+    background-color: #f9f9f9;
+    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+    padding: 12px 16px;
+    z-index: 1;
+    white-space: nowrap;
+}
+
+.prompt_dropdown:hover .dropdown-content {
+    background-color: var(--blur-bg);
+    display: block;
+}
+
+.dropdown-item {
+    background-color: var(--blur-bg);
+    white-space: nowrap;
+}
+
+.sub-dropdown-content {
+    white-space: normal;
+    background-color: var(--blur-bg);
+    display: none;
+    position: absolute;
+    left: 100%;
+    top: 0;
+    background-color: #f9f9f9;
+    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+    padding: 12px 16px;
+    z-index: 1;
+}
+
+.sub-dropdown:hover .sub-dropdown-content {
+    display: block;
+    background-color: var(--blur-bg);
+}

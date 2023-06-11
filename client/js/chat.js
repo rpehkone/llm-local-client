@@ -470,6 +470,23 @@ window.onload = async () => {
 		}
 	}
 
+	//////////////////////
+	//////////////////////
+	//////////////////////
+
+	fetch('/assets/data/predefined_prompts.json')
+		.then(response => response.json())
+		.then(data => {
+			try {
+				console.log(data);
+			} catch(err) {
+				console.error('Error parsing JSON string:', err);
+			}
+		})
+		.catch(error => console.error('Error fetching the file:', error));
+
+
+
 	message_input.addEventListener(`keydown`, async (evt) => {
 		if (prompt_lock) return;
 		if (evt.keyCode === 13 && !evt.shiftKey) {
@@ -538,6 +555,7 @@ document.getElementById('promptgen').addEventListener('change', function() {
 			msg = 'You will be my prompt engineer. We will iterate the prompts you output in order to arrive at a prompt that gives me the desired output. The first output you give me will ask what the prompt will be about, with some questions to get us on the right track. Then once you have an initial understanding of what the prompt is about, you will provide me with the first iteration. Then you will ask more questions to make the prompt better. We will continue this iterative process until we have arrived at the prompt we need to generate my desired output.';
 			break;
 		case 'a':
+			// 'Answer only with code block, no additional text. Can add comments if needed. '
 			msg = 'Suggest refactoring improvements and changes for the following code:';
 			break;
 		case 'b':
@@ -555,3 +573,4 @@ document.getElementById('promptgen').addEventListener('change', function() {
 	document.getElementById('message-input').value = msg;
 	this.value = 'prompt';
 });
+
