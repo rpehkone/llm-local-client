@@ -92,6 +92,7 @@ async function try_ask_gpt(message) {
 							<div class="content" id="user_${token}"> 
 									${format(message)}
 							</div>
+							<i class="fa-regular fa-trash trash-icon" onclick="deleteMessage('${window.token}')"></i>
 					</div>
 			`;
 
@@ -162,15 +163,6 @@ async function try_ask_gpt(message) {
 		tts_tick(chunk, false);
 		text += chunk;
 
-		// const objects         = chunk.match(/({.+?})/g);
-
-		// try { if (JSON.parse(objects[0]).success === false) throw new Error(JSON.parse(objects[0]).error) } catch (e) {}
-
-		// objects.forEach((object) => {
-		//     console.log(object)
-		//     try { text += h2a(JSON.parse(object).content) } catch(t) { console.log(t); throw new Error(t)}
-		// });
-
 		document.getElementById(`gpt_${window.token}`).innerHTML =
 			markdown.render(text);
 		document.querySelectorAll(`code`).forEach((el) => {
@@ -191,8 +183,8 @@ async function try_ask_gpt(message) {
 	//add error check for gpt api response
 	//and proxy enable
 
-	add_message(window.conversation_id, "user", message);
-	add_message(window.conversation_id, "assistant", text);
+	add_message(window.conversation_id, "user", message, window.token);
+	add_message(window.conversation_id, "assistant", text, window.token);
 
 	message_box.scrollTop = message_box.scrollHeight;
 	await remove_cancel_button();
@@ -206,7 +198,8 @@ const ask_gpt = async (message) => {
 	try {
 		try_ask_gpt(message);
 	} catch (e) {
-		add_message(window.conversation_id, "user", message);
+		console.log("api call failed")
+		add_message(window.conversation_id, "user", message, window.token);
 
 		message_box.scrollTop = message_box.scrollHeight;
 		await remove_cancel_button();
@@ -223,10 +216,10 @@ const ask_gpt = async (message) => {
 			let error_message = `oops ! something went wrong, please try again / reload. [stacktrace in console]`;
 
 			document.getElementById(`gpt_${window.token}`).innerHTML = error_message;
-			add_message(window.conversation_id, "assistant", error_message);
+			add_message(window.conversation_id, "assistant", error_message, window.token);
 		} else {
 			document.getElementById(`gpt_${window.token}`).innerHTML += ` [aborted]`;
-			add_message(window.conversation_id, "assistant", text + ` [aborted]`);
+			add_message(window.conversation_id, "assistant", text + ` [aborted]`, window.token);
 		}
 
 		window.scrollTo(0, 0);
@@ -320,13 +313,22 @@ const load_conversation = async (conversation_id) => {
 								<div class="user">
 										${item.role == "assistant" ? gpt_image : user_image}
 								</div>
-								<div class="content">
+								${
+									item.role == "user"
+									? `<div class="content" id="user_${item.message_id}">`
+									: `<div class="content" id="gpt_${item.message_id}">`
+								}
 										${
 											item.role == "assistant"
 												? markdown.render(item.content)
 												: item.content
 										}
 								</div>
+								${
+									item.role == "user"
+									? `<i class="fa-reqular fa-trash trash-icon" onclick="deleteMessage('${item.message_id}')"></i>`
+									: ''
+								}
 						</div>
 				`;
 	}
@@ -346,6 +348,10 @@ const get_conversation = async (conversation_id) => {
 	let conversation = await JSON.parse(
 		localStorage.getItem(`conversation:${conversation_id}`)
 	);
+	conversation.items = conversation.items.map(message => {
+        const { message_id, ...messageWithoutId } = message;
+        return messageWithoutId;
+    });
 	return conversation.items;
 };
 
@@ -362,7 +368,7 @@ const add_conversation = async (conversation_id, title) => {
 	}
 };
 
-const add_message = async (conversation_id, role, content) => {
+const add_message = async (conversation_id, role, content, message_id) => {
 	before_adding = JSON.parse(
 		localStorage.getItem(`conversation:${conversation_id}`)
 	);
@@ -370,6 +376,7 @@ const add_message = async (conversation_id, role, content) => {
 	before_adding.items.push({
 		role: role,
 		content: content,
+		message_id: message_id,
 	});
 
 	localStorage.setItem(
@@ -377,6 +384,25 @@ const add_message = async (conversation_id, role, content) => {
 		JSON.stringify(before_adding)
 	); // update conversation
 };
+
+function deleteMessage(message_id) {
+	const messageDivUser = document.getElementById(`user_${message_id}`)
+	const messageDivGpt = document.getElementById(`gpt_${message_id}`)
+	if (messageDivUser) {
+		messageDivUser.parentNode.remove();
+	}
+	if (messageDivGpt) {
+		messageDivGpt.parentNode.remove();
+	}
+	const conversation = JSON.parse(localStorage.getItem(`conversation:${window.conversation_id}`));
+	conversation.items = conversation.items.filter(item => item.message_id !== message_id);
+	localStorage.setItem(`conversation:${window.conversation_id}`, JSON.stringify(conversation));
+
+	const messages = document.getElementsByClassName("message");
+	if (messages.length === 0) {
+		delete_conversation(window.conversation_id);
+	};
+}
 
 const load_conversations = async (limit, offset, loader) => {
 	//console.log(loader);
@@ -469,10 +495,6 @@ window.onload = async () => {
 			await load_conversation(window.conversation_id);
 		}
 	}
-
-	//////////////////////
-	//////////////////////
-	//////////////////////
 
 	fetch('/assets/data/predefined_prompts.json')
 		.then(response => response.json())
@@ -568,7 +590,6 @@ const load_settings_localstorage = async () => {
 };
 
 function set_message_input(data, category_name, title) {
-	console.log("message:");
 	data.predefined_prompts.forEach(category => {
 		if (category.name == category_name) {
 			category.prompts.forEach(prompt => {

@@ -15,7 +15,7 @@ python run.py
 | Env Variable    | config.json    | examples                                           |
 |-----------------|----------------|----------------------------------------------------|
 | OPENAI_API_KEY  | openai_key     | sk-...                                             
-| OPENAI_API_BASE | openai_api_key | https://api.openai.com <br> https://openai.azure.com <br> http://my-reverse-proxy/  
+| OPENAI_API_BASE | openai_api_base | https://api.openai.com <br> https://openai.azure.com <br> http://my-reverse-proxy/  
 
 edit client/data/predefined_prompts.json.  
 

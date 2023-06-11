@@ -709,3 +709,15 @@ textarea {
     display: block;
     background-color: var(--blur-bg);
 }
+
+.trash-icon {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    opacity: 0.1;
+    transition: opacity 0.3s;
+}
+
+.trash-icon:hover {
+    opacity: 1;
+}

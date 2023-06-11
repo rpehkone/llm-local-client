@@ -91,8 +91,6 @@ class Backend_Api:
                         break
 
                     except Exception as e:
-                        print(e)
-                        print(e.__traceback__.tb_next)
                         continue
 
             return self.app.response_class(stream(), mimetype='text/event-stream')
