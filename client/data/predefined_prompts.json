@@ -29,6 +29,34 @@
 					"prompt": "Tell me a story about aliens in the style of Shakespeare."
 				}
 			]
+		},
+		{
+			"name": "Learn",
+			"prompts": [
+				{
+					"title": "Teach topic",
+					"prompt": "Teach me the {topic} and give me a quiz at the end, but don’t give me the answers and then tell me if I answered correctly."
+				},
+				{
+					"title": "Write essay",
+					"prompt": "Write an essay outlining the topic {topic} in chronological order."
+				},
+				{
+					"title": "Quiz",
+					"prompt": "Come up with a multiple-choice exercise to test knowledge of {topic}. After every question i will answer, and you will tell me was the answer correct, and with a next question."
+				}
+			]
+		}
+	],
+	"example": [
+		{
+			"name": "",
+			"prompts": [
+				{
+					"title": "",
+					"prompt": ""
+				}
+			]
 		}
 	]
 }

@@ -478,7 +478,29 @@ window.onload = async () => {
 		.then(response => response.json())
 		.then(data => {
 			try {
-				console.log(data);
+				const dropdown = document.querySelector(`.prompt_dropdown-content`);
+				data.predefined_prompts.forEach(category => {
+					var categoryDiv = document.createElement('div');
+					categoryDiv.className = "prompt_dropdown sub-dropdown";
+					categoryDiv.textContent = category.name;
+					var promptDiv = document.createElement('div');
+					promptDiv.className = "sub-dropdown-content";
+
+					category.prompts.forEach(prompt => {
+						var link = document.createElement('a');
+						link.className = "dropdown-item";
+						link.textContent = prompt.title;
+						link.onclick = function () {
+							set_message_input(data, category.name, prompt.title);
+						};
+						promptDiv.appendChild(link);
+						promptDiv.appendChild(document.createElement('br'));
+					});
+
+					categoryDiv.appendChild(promptDiv);
+					dropdown.appendChild(categoryDiv);
+					dropdown.appendChild(document.createElement('br'));
+				});
 			} catch(err) {
 				console.error('Error parsing JSON string:', err);
 			}
@@ -491,7 +513,6 @@ window.onload = async () => {
 		if (prompt_lock) return;
 		if (evt.keyCode === 13 && !evt.shiftKey) {
 				evt.preventDefault();
-				console.log('pressed enter');
 				await handle_ask();
 		} else {
 			message_input.style.height = `25px`;
@@ -546,31 +567,17 @@ const load_settings_localstorage = async () => {
 	});
 };
 
-document.getElementById('promptgen').addEventListener('change', function() {
-	var selected = this.options[this.selectedIndex].value;
-	let msg = '';
-
-	switch (selected) {
-		case '0':
-			msg = 'You will be my prompt engineer. We will iterate the prompts you output in order to arrive at a prompt that gives me the desired output. The first output you give me will ask what the prompt will be about, with some questions to get us on the right track. Then once you have an initial understanding of what the prompt is about, you will provide me with the first iteration. Then you will ask more questions to make the prompt better. We will continue this iterative process until we have arrived at the prompt we need to generate my desired output.';
-			break;
-		case 'a':
-			// 'Answer only with code block, no additional text. Can add comments if needed. '
-			msg = 'Suggest refactoring improvements and changes for the following code:';
-			break;
-		case 'b':
-			msg = 'Translate the following code to ';
-			break;
-		case 'c':
-			msg = 'Create documentation for functionality and API of the following code: '
-			break;
-		case 'z':
-			msg = 'Rewrite the following c code to use SSE and AVX vectorization: ';
-			break;
-		default:
-			break;
-	}
-	document.getElementById('message-input').value = msg;
-	this.value = 'prompt';
-});
-
+function set_message_input(data, category_name, title) {
+	console.log("message:");
+	data.predefined_prompts.forEach(category => {
+		if (category.name == category_name) {
+			category.prompts.forEach(prompt => {
+				if (prompt.title == title) {
+					document.getElementById('message-input').value = prompt.prompt;
+					message_input.style.height = message_input.scrollHeight + 4 + "px";
+					return;
+				}
+			});
+		}
+	});
+}

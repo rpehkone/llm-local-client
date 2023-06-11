@@ -671,7 +671,7 @@ textarea {
     appearance: none;
 }
 
-.dropdown-content {
+.prompt_dropdown-content {
     background-color: var(--blur-bg);
     display: none;
     position: absolute;
@@ -682,7 +682,7 @@ textarea {
     white-space: nowrap;
 }
 
-.prompt_dropdown:hover .dropdown-content {
+.prompt_dropdown:hover .prompt_dropdown-content {
     background-color: var(--blur-bg);
     display: block;
 }
