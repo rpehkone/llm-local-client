@@ -85,7 +85,7 @@ async function try_ask_gpt(message) {
 	stop_generating.classList.remove(`stop_generating-hidden`);
 
 	message_box.innerHTML += `
-					<div class="message">
+					<div class="message message_user">
 							<div class="user">
 									${user_image}
 							</div>
@@ -104,7 +104,7 @@ async function try_ask_gpt(message) {
 	window.scrollTo(0, 0);
 
 	message_box.innerHTML += `
-					<div class="message">
+					<div class="message message_gpt">
 							<div class="user">
 									${gpt_image}
 							</div>
@@ -309,7 +309,11 @@ const load_conversation = async (conversation_id) => {
 
 	for (item of conversation.items) {
 		message_box.innerHTML += `
-						<div class="message">
+						${
+							item.role == "user"
+							? `<div class="message message_user">`
+							: `<div class="message message_gpt">`
+						}
 								<div class="user">
 										${item.role == "assistant" ? gpt_image : user_image}
 								</div>

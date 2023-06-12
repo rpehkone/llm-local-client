@@ -5,6 +5,7 @@
     --accent: #8000ff;
     --enabled: #008800;
     --blur-bg: #444654;
+    --blur-bg-dark: #413f50;
     --blur-border: #000000;
     --user-input: #000000;
     --conversations: #000000ff;
@@ -13,7 +14,7 @@
 :root {
     --font-1: "Inter", sans-serif;
     --font-mono-1: "Roboto Mono", monospace;
-    --section-gap: 25px;
+    --section-gap: 20px;
     --border-radius-1: 8px;
 }
 
@@ -142,14 +143,21 @@ body {
     text-overflow: ellipsis;
 }
 
-.message {
+.message_user {
+    background-color: var(--blur-bg-dark);
+}
 
+.message_gpt {
+    background-color: var(--blur-bg);
+}
+
+.message {
     width: 100%;
     overflow-wrap: break-word;
     display: flex;
     gap: var(--section-gap);
     padding: var(--section-gap);
-    padding-bottom: 0;
+    /* padding-bottom: 0; */
 }
 
 .message:last-child {
