@@ -19,4 +19,4 @@ python run.py
 
 edit client/data/predefined_prompts.json.  
 
-<img src="preview.png" width="1000" height="auto"/>  
+<img src="preview.gif" width="1000" height="auto"/>  
