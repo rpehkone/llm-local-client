@@ -77,7 +77,12 @@ body {
     gap: 15px;
 }
 
-.conversation #messages {
+#messages_contain {
+    position: relative;
+    height: 100%;
+}
+
+#messages {
     width: 100%;
     display: flex;
     flex-direction: column;
@@ -85,6 +90,16 @@ body {
     overflow-y: inherit;
     overflow-x: hidden;
     padding-bottom: 50px;
+    background-color: #0000;
+}
+
+#canvas {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -1; 
 }
 
 .conversation input {

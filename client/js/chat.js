@@ -47,7 +47,7 @@ let tts_rolling_buffer = ""
 function tts_tick(chunk, last_tick) {
 	tts_rolling_buffer += chunk
 
-	tts_enabled = document.getElementById("tts_switch").checked;
+	let tts_enabled = document.getElementById("tts_switch").checked;
 	if (!tts_enabled) {
 		return;
 	}
@@ -76,8 +76,8 @@ async function try_ask_gpt(message) {
 	window.scrollTo(0, 0);
 	window.controller = new AbortController();
 
-	jailbreak = document.getElementById("jailbreak");
-	model = document.getElementById("model");
+	let jailbreak = document.getElementById("jailbreak");
+	let model = document.getElementById("model");
 	prompt_lock = true;
 	window.text = ``;
 	window.token = message_id();
@@ -155,7 +155,7 @@ async function try_ask_gpt(message) {
 		const { value, done } = await reader.read();
 		if (done) break;
 
-		chunk = new TextDecoder().decode(value);
+		let chunk = new TextDecoder().decode(value);
 
 		if (chunk.includes(`<form id="challenge-form" action="/backend-api/v2/conversation?`)) {
 			chunk = `cloudflare token expired, please refresh the page.`;
@@ -299,6 +299,7 @@ const new_conversation = async () => {
 
 	await clear_conversation();
 	await load_conversations(20, 0, true);
+	random_shader();
 };
 
 const load_conversation = async (conversation_id) => {
@@ -423,7 +424,7 @@ const load_conversations = async (limit, offset, loader) => {
 	//if (loader === undefined) spinner.parentNode.removeChild(spinner)
 	await clear_conversations();
 
-	for (conversation of conversations) {
+	for (let conversation of conversations) {
 		box_conversations.innerHTML += `
 		<div class="convo" id="convo-${conversation.id}">
 			<div class="left" onclick="set_conversation('${conversation.id}')">
@@ -470,10 +471,10 @@ const uuid = () => {
 };
 
 const message_id = () => {
-	random_bytes = (Math.floor(Math.random() * 1338377565) + 2956589730).toString(
+	let random_bytes = (Math.floor(Math.random() * 1338377565) + 2956589730).toString(
 		2
 	);
-	unix = Math.floor(Date.now() / 1000).toString(2);
+	let unix = Math.floor(Date.now() / 1000).toString(2);
 
 	return BigInt(`0b${unix}${random_bytes}`).toString();
 };
@@ -481,7 +482,7 @@ const message_id = () => {
 window.onload = async () => {
 	load_settings_localstorage();
 
-	conversations = 0;
+	let conversations = 0;
 	for (let i = 0; i < localStorage.length; i++) {
 		if (localStorage.key(i).startsWith("conversation:")) {
 			conversations += 1;
@@ -556,8 +557,8 @@ window.onload = async () => {
 };
 
 const register_settings_localstorage = async () => {
-	settings_ids = ["web_switch", "model", "jailbreak"];
-	settings_elements = settings_ids.map((id) => document.getElementById(id));
+	let settings_ids = ["web_switch", "model", "jailbreak"];
+	let settings_elements = settings_ids.map((id) => document.getElementById(id));
 	settings_elements.map((element) =>
 		element.addEventListener(`change`, async (event) => {
 			switch (event.target.type) {
@@ -575,8 +576,8 @@ const register_settings_localstorage = async () => {
 };
 
 const load_settings_localstorage = async () => {
-	settings_ids = ["web_switch", "model", "jailbreak"];
-	settings_elements = settings_ids.map((id) => document.getElementById(id));
+	let settings_ids = ["web_switch", "model", "jailbreak"];
+	let settings_elements = settings_ids.map((id) => document.getElementById(id));
 	settings_elements.map((element) => {
 		if (localStorage.getItem(element.id)) {
 			switch (element.type) {
@@ -606,3 +607,52 @@ function set_message_input(data, category_name, title) {
 		}
 	});
 }
+
+const initialUserFragment =
+`void main() {
+	fragColor = vec4(0.0);
+}
+`;
+
+let prevRandshader = -1
+function random_shader() {
+	let shaders = [
+		'ascii_spiral.toy.glsl',
+		'organic.toy.glsl',
+		'particles.toy.glsl',
+		'square_matrix.toy.glsl',
+	];
+
+	let randomIndex = prevRandshader;
+	while (prevRandshader == randomIndex) {
+		randomIndex = Math.floor(Math.random() * shaders.length);
+	}
+	prevRandshader = randomIndex
+
+
+	fetch('/assets/data/' + shaders[randomIndex])
+		.then(response => response.text())
+		.then(data => {
+			init_render(data);
+		});
+};
+
+document.addEventListener("DOMContentLoaded", function () {
+	init_render(initialUserFragment);
+	random_shader();
+	requestAnimationFrame(render);
+});
+
+function onDOMChange(mutationsList, observer) {
+	setTimeout(function() {
+		var numChild = message_box.children.length;
+		if (numChild > 1) {
+			canvas.style.display = 'none';
+		} else {
+			canvas.style.display = '';
+		}
+	}, 50);
+}
+const observer = new MutationObserver(onDOMChange);
+const config = { attributes: false, childList: true, subtree: true };
+observer.observe(document, config);
