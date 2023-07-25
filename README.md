@@ -19,4 +19,6 @@ python run.py
 
 edit client/data/predefined_prompts.json.  
 
+this is a fork of (various new features) https://github.com/xtekky/chatgpt-clone  
+
 <img src="preview.gif" width="1000" height="auto"/>  
