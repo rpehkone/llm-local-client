@@ -20,3 +20,5 @@ python run.py
 | OPENAI_API_BASE | openai_api_base | https://api.openai.com <br> https://openai.azure.com <br> http://my-reverse-proxy/  
 
 edit client/data/predefined_prompts.json.  
+
+this is a fork of (various new features) https://github.com/xtekky/chatgpt-clone  
