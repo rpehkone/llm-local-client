@@ -1,4 +1,6 @@
-## ChatGPT local client  
+## llm local client  
+
+<img src="preview.gif" width="1000" height="auto"/>  
 
 ```
 python -m venv venv  
@@ -18,5 +20,3 @@ python run.py
 | OPENAI_API_BASE | openai_api_base | https://api.openai.com <br> https://openai.azure.com <br> http://my-reverse-proxy/  
 
 edit client/data/predefined_prompts.json.  
-
-<img src="preview.gif" width="1000" height="auto"/>  
