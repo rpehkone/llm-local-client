@@ -69,9 +69,9 @@ class Backend_Api:
                 proxies = proxies,
                 headers = {
                     'Authorization': 'Bearer %s' % self.openai_key
-                }, 
+                },
                 json    = {
-                    'model'             : request.json['model'], 
+                    'model'             : request.json['model'],
                     'messages'          : conversation,
                     'stream'            : True
                 },

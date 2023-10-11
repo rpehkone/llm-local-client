@@ -3,11 +3,6 @@
 <img src="preview.gif" width="1000" height="auto"/>  
 
 ```
-python -m venv venv  
-bash:  
-    source venv/bin/activate  
-windows:  
-    venv\Scripts\activate  
 pip install -r requirements.txt  
 python run.py  
 ```
@@ -21,4 +16,5 @@ python run.py
 
 edit client/data/predefined_prompts.json.  
 
-this is a fork of (various new features) https://github.com/xtekky/chatgpt-clone  
+this is a fork of (with various new features) https://github.com/xtekky/chatgpt-clone  
+
